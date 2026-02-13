@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Network Attack Detection</title>
-    <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Network Attack Detection</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
+<div class="theme-toggle">
+    <button id="themeBtn">🌙 Dark Mode</button>
+</div>
 
 <div class="container">
 
     <h1>Network Attack Detection</h1>
     <p class="subtitle">AI Security Dashboard</p>
 
+    <div class="traffic-animation">
+        <div class="pulse"></div>
+        <div class="pulse"></div>
+        <div class="pulse"></div>
+    </div>
+
     <div class="card-container">
 
-        <!-- ================= INPUT CARD ================= -->
         <div class="card">
             <h2>Traffic Input</h2>
 
@@ -27,16 +37,16 @@
                 </label>
 
                 <label>src_bytes</label>
-                <input type="number" id="src_bytes" placeholder="Enter source bytes" min="0" required>
+                <input type="number" id="src_bytes" min="0" required>
 
                 <label>src_ip_bytes</label>
-                <input type="number" id="src_ip_bytes" placeholder="Enter source IP bytes" min="0" required>
+                <input type="number" id="src_ip_bytes" min="0" required>
 
                 <label>dst_port</label>
-                <input type="number" id="dst_port" placeholder="Enter destination port" min="0" required>
+                <input type="number" id="dst_port" min="0" required>
 
                 <label>src_pkts</label>
-                <input type="number" id="src_pkts" placeholder="Enter source packets" min="0" required>
+                <input type="number" id="src_pkts" min="0" required>
 
                 <label>
                     <input type="checkbox" id="conn_state_SH">
@@ -50,14 +60,11 @@
             </form>
         </div>
 
-        <!-- ================= RESULT CARD ================= -->
         <div class="card">
             <h2>Detection Result</h2>
-
             <div id="resultArea">
                 <p class="waiting">Awaiting analysis...</p>
             </div>
-
         </div>
 
     </div>
