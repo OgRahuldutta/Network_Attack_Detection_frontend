@@ -1,67 +1,58 @@
 const API_URL = "https://ograhul-network-attack-detection.hf.space/predict";
 
-document.addEventListener("DOMContentLoaded", function () {
+const form = document.getElementById("predictionForm");
+const resultArea = document.getElementById("resultArea");
 
-    const form = document.getElementById("predictionForm");
-    const resultText = document.getElementById("resultText");
-    const confidenceBar = document.getElementById("confidenceBar");
-    const confidenceValue = document.getElementById("confidenceValue");
-    const encodedLabel = document.getElementById("encodedLabel");
+form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-    form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    resultArea.innerHTML = "<p>Analyzing traffic...</p>";
 
-        resultText.innerText = "Analyzing...";
-        resultText.style.color = "white";
-        encodedLabel.innerText = "Encoded Label: -";
-        confidenceBar.style.width = "0%";
-        confidenceValue.innerText = "";
+    const data = {
+        conn_state_REJ: document.getElementById("conn_state_REJ").checked,
+        src_bytes: parseFloat(document.getElementById("src_bytes").value),
+        src_ip_bytes: parseFloat(document.getElementById("src_ip_bytes").value),
+        dst_port: parseInt(document.getElementById("dst_port").value),
+        src_pkts: parseFloat(document.getElementById("src_pkts").value),
+        conn_state_SH: document.getElementById("conn_state_SH").checked
+    };
 
-        const payload = {
-            conn_state_REJ: document.getElementById("conn_state_REJ").checked,
-            src_bytes: Number(document.getElementById("src_bytes").value),
-            src_ip_bytes: Number(document.getElementById("src_ip_bytes").value),
-            dst_port: Number(document.getElementById("dst_port").value),
-            src_pkts: Number(document.getElementById("src_pkts").value),
-            conn_state_SH: document.getElementById("conn_state_SH").checked
-        };
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error("Server error");
-            }
-
-            const result = await response.json();
-
-            const confidencePercent = (result.confidence * 100).toFixed(2);
-
-            resultText.innerText = `Attack Type: ${result.attack_type}`;
-            encodedLabel.innerText = `Encoded Label: ${result.encoded_prediction}`;
-            confidenceBar.style.width = confidencePercent + "%";
-            confidenceValue.innerText = `Confidence: ${confidencePercent}%`;
-
-            if (result.attack_type === "normal") {
-                resultText.style.color = "#22c55e";
-                confidenceBar.style.background = "#22c55e";
-            } else {
-                resultText.style.color = "#ef4444";
-                confidenceBar.style.background = "#ef4444";
-            }
-
-        } catch (error) {
-            resultText.innerText = "⚠ Backend connection error";
-            resultText.style.color = "#ef4444";
-            encodedLabel.innerText = "";
-            confidenceBar.style.width = "0%";
-            confidenceValue.innerText = "";
-            console.error(error);
+        if (!response.ok) {
+            throw new Error("Server error");
         }
-    });
 
+        const result = await response.json();
+
+        const confidencePercent = (result.confidence * 100).toFixed(2);
+
+        resultArea.innerHTML = `
+            <div class="result-attack">
+                Attack Type: ${result.attack_type}
+            </div>
+            <div class="result-encoded">
+                Encoded Label: ${result.encoded_prediction}
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width:${confidencePercent}%"></div>
+            </div>
+            <p>Confidence: ${confidencePercent}%</p>
+        `;
+
+        // Reset form after success
+        form.reset();
+
+    } catch (error) {
+        resultArea.innerHTML = `
+            <p style="color:red;">Backend connection error</p>
+        `;
+    }
 });
